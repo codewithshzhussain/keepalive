@@ -1,0 +1,16 @@
+[
+  {
+    "name": "PHPSESSID",
+    "value": "cl999tl4842r94o0otd3n0sb90",
+    "domain": ".toolswala.net",
+    "path": "/",
+    "expires": -1,
+    "size": 35,
+    "httpOnly": true,
+    "secure": true,
+    "session": true,
+    "sameParty": false,
+    "sourceScheme": "Secure",
+    "sourcePort": 443
+  }
+]
