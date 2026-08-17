@@ -8,9 +8,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: toolswala-keepalive
+  cancel-in-progress: true
+
 jobs:
   ping:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
 
@@ -32,4 +37,5 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add cookies.json
           git diff --cached --quiet || git commit -m "Update session"
+          git pull --rebase
           git push
