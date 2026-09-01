@@ -18,6 +18,7 @@ async function login(page) {
     const user = process.env.TOOLSWALA_USERNAME;
     const pass = process.env.TOOLSWALA_PASSWORD;
     if (!user || !pass) throw new Error('Credentials missing — GitHub Secrets check karein.');
+    console.log('DEBUG: username length =', user.length, '| password length =', pass.length);
 
     await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
@@ -46,7 +47,16 @@ async function login(page) {
         submitBtn.click(),
     ]);
 
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 4000));
+
+    // ---- DEBUG INFO ----
+    console.log('DEBUG URL:', page.url());
+    const bodyText = await page.evaluate(() => document.body.innerText.slice(0, 600));
+    console.log('DEBUG PAGE TEXT:', bodyText);
+    const cookieNames = (await page.cookies()).map(c => c.name).join(', ');
+    console.log('DEBUG COOKIES:', cookieNames);
+    // ---- END DEBUG ----
+
     if (!(await checkLoggedIn(page))) {
         throw new Error('Login fail hua — dashboard par nahi pahunche.');
     }
