@@ -6,34 +6,50 @@ const LOGIN_URL = 'https://members.toolswala.net/login';
 const COOKIES_FILE = './cookies.json';
 
 async function checkLoggedIn(page) {
-    const url = page.url();
-    if (url.includes('/login')) return false;
-
-    return page.evaluate(() => {
-        return document.body.innerText.includes('subscriptions') ||
-               document.body.innerText.includes('Dashboard');
-    });
+    if (page.url().includes('/login')) return false;
+    const hasLoginForm = await page.$('input[type="submit"][value="Login"]');
+    if (hasLoginForm) return false;
+    return page.evaluate(() =>
+        /dashboard|subscriptions|tool library|logout/i.test(document.body.innerText)
+    );
 }
 
 async function login(page) {
+    const user = process.env.TOOLSWALA_USERNAME;
+    const pass = process.env.TOOLSWALA_PASSWORD;
+    if (!user || !pass) throw new Error('Credentials missing — GitHub Secrets check karein.');
+
     await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForSelector('input[type="text"], input[type="email"]', { timeout: 15000 });
 
-    const userField = await page.$('input[type="text"], input[type="email"]');
+    const captchaVisible = await page.evaluate(() => {
+        const el = document.querySelector('#login-recaptcha-row');
+        return el && window.getComputedStyle(el).display !== 'none';
+    });
+    if (captchaVisible) {
+        throw new Error('reCAPTCHA active ho gaya — manually login kar ke reset karein.');
+    }
+
+    const userField = await page.$('.am-row-login-login input');
+    const passField = await page.$('.am-row-login-pass input[type="password"]');
+    if (!userField || !passField) throw new Error('Login fields nahi mile — page structure badal gaya.');
+
     await userField.click({ clickCount: 3 });
-    await userField.type(process.env.TOOLSWALA_USERNAME, { delay: 30 });
-
-    const passField = await page.$('input[type="password"]');
+    await userField.type(user, { delay: 30 });
     await passField.click({ clickCount: 3 });
-    await passField.type(process.env.TOOLSWALA_PASSWORD, { delay: 30 });
+    await passField.type(pass, { delay: 30 });
+
+    const submitBtn = await page.$('.am-row-buttons input[type="submit"]');
+    if (!submitBtn) throw new Error('Login button nahi mila.');
 
     await Promise.all([
-        page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }),
-        page.click('button[type="submit"], input[type="submit"], button'),
+        page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => {}),
+        submitBtn.click(),
     ]);
 
-    const ok = await checkLoggedIn(page);
-    if (!ok) throw new Error('Login lagta hai fail hua — dashboard par nahi pahunche.');
+    await new Promise(r => setTimeout(r, 2000));
+    if (!(await checkLoggedIn(page))) {
+        throw new Error('Login fail hua — dashboard par nahi pahunche.');
+    }
     console.log('Login successful.');
 }
 
@@ -45,8 +61,12 @@ async function run() {
     const page = await browser.newPage();
 
     if (fs.existsSync(COOKIES_FILE)) {
-        const saved = JSON.parse(fs.readFileSync(COOKIES_FILE, 'utf8'));
-        if (Array.isArray(saved) && saved.length) await page.setCookie(...saved);
+        try {
+            const saved = JSON.parse(fs.readFileSync(COOKIES_FILE, 'utf8'));
+            if (Array.isArray(saved) && saved.length) await page.setCookie(...saved);
+        } catch (e) {
+            console.log('cookies.json corrupt tha — ignore kar diya.');
+        }
     }
 
     await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -60,7 +80,6 @@ async function run() {
 
     const cookies = await page.cookies();
     fs.writeFileSync(COOKIES_FILE, JSON.stringify(cookies, null, 2));
-
     await browser.close();
 }
 
