@@ -20,9 +20,6 @@ async function login(page) {
     if (!user || !pass) throw new Error('Credentials missing — GitHub Secrets check karein.');
     console.log('DEBUG: username length =', user.length, '| password length =', pass.length);
 
-    const client = await page.target().createCDPSession();
-    await client.send('Network.clearBrowserCookies');
-
     await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     const userField = await page.$('input[name="amember_login"]')
