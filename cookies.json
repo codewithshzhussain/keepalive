@@ -1,11 +1,11 @@
 [
   {
-    "name": "PHPSESSID",
-    "value": "rokiuuauo7itk2lgd32on1b6vh",
+    "name": "amember_nr",
+    "value": "06a68716e752b25154f9739156d71e1e",
     "domain": ".captainfbatools.com",
     "path": "/",
     "expires": -1,
-    "size": 35,
+    "size": 42,
     "httpOnly": true,
     "secure": true,
     "session": true,
@@ -14,12 +14,12 @@
     "sourcePort": 443
   },
   {
-    "name": "amember_nr",
-    "value": "06a68716e752b25154f9739156d71e1e",
+    "name": "PHPSESSID",
+    "value": "rokiuuauo7itk2lgd32on1b6vh",
     "domain": ".captainfbatools.com",
     "path": "/",
     "expires": -1,
-    "size": 42,
+    "size": 35,
     "httpOnly": true,
     "secure": true,
     "session": true,
