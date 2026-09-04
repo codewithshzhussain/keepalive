@@ -1,20 +1,30 @@
 [
   {
-    "name": "PHPSESSID",
-    "value": "s4mivqb8ejl45omq09ugpq2su4",
-    "domain": ".captainfbatools.com",
-    "path": "/",
-    "expires": -1,
-    "httpOnly": true,
-    "secure": true
-  },
-  {
     "name": "amember_nr",
     "value": "02f7ddcf689fc5f621cf96d2ea0f1f02",
     "domain": ".captainfbatools.com",
     "path": "/",
     "expires": -1,
+    "size": 42,
     "httpOnly": true,
-    "secure": true
+    "secure": true,
+    "session": true,
+    "sameParty": false,
+    "sourceScheme": "Secure",
+    "sourcePort": 443
+  },
+  {
+    "name": "PHPSESSID",
+    "value": "s4mivqb8ejl45omq09ugpq2su4",
+    "domain": ".captainfbatools.com",
+    "path": "/",
+    "expires": -1,
+    "size": 35,
+    "httpOnly": true,
+    "secure": true,
+    "session": true,
+    "sameParty": false,
+    "sourceScheme": "Secure",
+    "sourcePort": 443
   }
 ]
