@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-const DASHBOARD_URL = 'https://captainfbatools.com/amember/member';
+const DASHBOARD_URL = 'https://members.softzilla.net/member';
 const COOKIES_FILE = './cookies.json';
-const NEEDED = ['PHPSESSID', 'amember_nr'];
+const NEEDED = ['PHPSESSID', 'amember_nr', 'amember_user'];
 
 function loadCookies() {
     const raw = JSON.parse(fs.readFileSync(COOKIES_FILE, 'utf8'));
@@ -15,7 +15,7 @@ function loadCookies() {
             const out = {
                 name: c.name,
                 value: c.value,
-                domain: c.domain || '.captainfbatools.com',
+                domain: c.domain || '.softzilla.net',
                 path: c.path || '/',
                 httpOnly: c.httpOnly !== false,
                 secure: c.secure !== false,
@@ -24,11 +24,10 @@ function loadCookies() {
             return out;
         });
 
-    const found = cleaned.map(c => c.name);
-    for (const n of NEEDED) {
-        if (!found.includes(n)) throw new Error(`Cookie "${n}" nahi mili — dobara export karein.`);
+    if (!cleaned.find(c => c.name === 'PHPSESSID')) {
+        throw new Error('PHPSESSID nahi mili — dobara export karein.');
     }
-    console.log('Cookies loaded:', found.join(', '));
+    console.log('Cookies loaded:', cleaned.map(c => c.name).join(', '));
     return cleaned;
 }
 
